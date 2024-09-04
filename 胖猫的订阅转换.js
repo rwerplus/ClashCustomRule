@@ -50,7 +50,7 @@ function main(config) {
       interval: 300,
     },
     {
-      icon: "https://mirror.ghproxy.com/https://raw.githubusercontent.com/Orz-3/mini/master/Color/HK.png",
+      icon: "https://mirror.ghproxy.com/https://raw.githubusercontent.com/Orz-3/mini/master/Color/CN.png",
       "include-all": true,
       "exclude-filter": "(?i)GB|Traffic|Expire|Premium|频道|订阅|ISP|流量|到期|重置",
       filter: "(?i)台|新北|彰化|TW|Taiwan",
