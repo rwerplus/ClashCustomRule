@@ -199,6 +199,36 @@ const ruleProviders = {
     url: "https://fastly.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/applications.txt",
     path: "./ruleset/loyalsoldier/applications.yaml",
   },
+  AD: {
+    ...ruleProviderCommon,
+    behavior: "domain",
+    url: "https://raw.githubusercontent.com/earoftoast/clash-rules/main/AD.yaml",
+    path: "./rules/AD.yaml",
+  },
+  EasyList: {
+    ...ruleProviderCommon,
+    behavior: "domain",
+    url: "https://raw.githubusercontent.com/earoftoast/clash-rules/main/EasyList.yaml",
+    path: "./rules/EasyList.yaml",
+  },
+  EasyListChina: {
+    ...ruleProviderCommon,
+    behavior: "domain",
+    url: "https://raw.githubusercontent.com/earoftoast/clash-rules/main/EasyListChina.yaml",
+    path: "./rules/EasyListChina.yaml",
+  },
+  EasyPrivacy: {
+    ...ruleProviderCommon,
+    behavior: "domain",
+    url: "https://raw.githubusercontent.com/earoftoast/clash-rules/main/EasyPrivacy.yaml",
+    path: "./rules/EasyPrivacy.yaml",
+  },
+  ProgramAD: {
+    ...ruleProviderCommon,
+    behavior: "domain",
+    url: "https://raw.githubusercontent.com/earoftoast/clash-rules/main/ProgramAD.yaml",
+    path: "./rules/ProgramAD.yaml",
+  },
 };
 // 规则
 const rules = [
@@ -229,6 +259,11 @@ const rules = [
   // 其他规则
   "GEOIP,LAN,全局直连,no-resolve",
   "GEOIP,CN,全局直连,no-resolve",
+  "RULE-SET,AD,广告过滤",
+  "RULE-SET,EasyList,广告过滤",
+  "RULE-SET,EasyListChina,广告过滤",
+  "RULE-SET,EasyPrivacy,广告过滤",
+  "RULE-SET,ProgramAD,广告过滤",
   "MATCH,漏网之鱼",
 ];
 // 代理组通用配置
