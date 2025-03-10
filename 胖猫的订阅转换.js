@@ -93,12 +93,6 @@ const ruleProviderCommon = {
 };
 // 规则集配置
 const ruleProviders = {
-  netflix: {
-    ...ruleProviderCommon,
-    behavior: "classical",
-    url: "https://cdn.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Netflix/Netflix_IP.txt",
-    path: "./ruleset/blackmatrix7/netflix.yaml",
-  },
   netflix_domain: {
     ...ruleProviderCommon,
     behavior: "classical",
@@ -110,12 +104,6 @@ const ruleProviders = {
     behavior: "domain",
     url: "https://fastly.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/reject.txt",
     path: "./ruleset/Loyalsoldier/Advertising.yaml",
-  },
-  ads: {
-    ...ruleProviderCommon,
-    behavior: "domain",
-    url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/AdGuard/Advertising/Advertising.txt",
-    path: "./ruleset/blackmatrix7/ads.yaml",
   },
   spotify: {
     url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Spotify/Spotify.yaml",
@@ -135,14 +123,6 @@ const ruleProviders = {
     url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Bahamut/Bahamut.yaml",
     path: "./ruleset/Bahamut.yaml",
     behavior: "classical",
-    interval: 86400,
-    format: "yaml",
-    type: "http",
-  },
-  telegram_domain: {
-    url: "https://mirror.ghproxy.com/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/telegram.yaml",
-    path: "./ruleset/telegram_domain.yaml",
-    behavior: "domain",
     interval: 86400,
     format: "yaml",
     type: "http",
@@ -234,10 +214,8 @@ const rules = [
   // Loyalsoldier 规则集
   "RULE-SET,applications,全局直连",
   "RULE-SET,bahamut,Bahamut",
-  "RULE-SET,netflix,Netflix",
   "RULE-SET,private,全局直连",
   "RULE-SET,reject,广告过滤",
-  "RULE-SET,ads,广告过滤",
   "RULE-SET,icloud,微软服务",
   "RULE-SET,apple,苹果服务",
   "RULE-SET,google,谷歌服务",
@@ -248,7 +226,6 @@ const rules = [
   "RULE-SET,lancidr,全局直连,no-resolve",
   "RULE-SET,cncidr,全局直连,no-resolve",
   "RULE-SET,telegramcidr,电报消息,no-resolve",
-  "RULE-SET,telegram_domain,电报消息",
   // 其他规则
   "GEOIP,LAN,全局直连,no-resolve",
   "GEOIP,CN,全局直连,no-resolve",
