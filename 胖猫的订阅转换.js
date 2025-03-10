@@ -1,11 +1,11 @@
 const mineRules = [
-  "DOMAIN,*.tuxingkeji.com,全局直连",
   "DOMAIN,1024zyz.com,节点选择",
+  "DOMAIN-SUFFIX,bigmeok.me,节点选择",
+  "DOMAIN-SUFFIX,sorryios.com,节点选择",
   "DOMAIN,freebsd.org,节点选择",
   "RULE-SET,openai,AIGC",
   "DOMAIN,*.chatgpt.com,AIGC",
   "DOMAIN,*.perplexity.ai:443,AIGC",
-  "DOMAIN,*.githubcopilot.com,AIGC",
   "DOMAIN,*.cursor.sh,AIGC",
   "DOMAIN,*.cursor.com,AIGC",
   "DOMAIN,*.perplexity.ai,AIGC",
@@ -14,6 +14,7 @@ const mineRules = [
   "DOMAIN-SUFFIX,cursor.sh,AIGC",
   "DOMAIN-SUFFIX,cursor.com,AIGC",
   "DOMAIN-SUFFIX,perplexity.ai,AIGC",
+  "DOMAIN-SUFFIX,grok.com,AIGC",
   "DOMAIN-SUFFIX,api2.cursor.sh:443,AIGC",
   "DOMAIN-SUFFIX,codeium.com,AIGC",
   "DOMAIN-SUFFIX,sorryios.com,节点选择",
@@ -35,6 +36,7 @@ const mineRules = [
   "DOMAIN-SUFFIX,15sm.cn,全局直连",
   "DOMAIN-SUFFIX,mf-site2.xyz,全局直连",
   "DOMAIN-SUFFIX,user.mf-site2.xyz,全局直连",
+  "DOMAIN-SUFFIX,dji.net,全局直连",
   "DOMAIN-SUFFIX,556688.cfd,全局直连",
 ]
 // 国内DNS服务器
@@ -373,7 +375,6 @@ function main(config) {
       name: "AIGC",
       type: "select",
       "include-all": true,
-      filter: "(?i)香|香港|HK|ChatGPT|Gpt|GPT|日本|Japan|🇯🇵|美国|USA|🇺🇸|新加坡|Singapore|🇸🇬",
       icon: "https://mirror.ghproxy.com/https://raw.githubusercontent.com/Orz-3/mini/master/Color/OpenAI.png",
     },
     {
@@ -485,7 +486,7 @@ function main(config) {
   config["rule-providers"] = ruleProviders;
   config["rules"] = rules;
   // 覆盖原配置中DNS配置
-  config["dns"] = dnsConfig;
+  // config["dns"] = dnsConfig;
   // 返回修改后的配置
   return config;
 }
