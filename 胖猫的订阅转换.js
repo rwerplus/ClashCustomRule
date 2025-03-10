@@ -111,6 +111,12 @@ const ruleProviders = {
     url: "https://fastly.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/reject.txt",
     path: "./ruleset/Loyalsoldier/Advertising.yaml",
   },
+  ads: {
+    ...ruleProviderCommon,
+    behavior: "domain",
+    url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/AdGuard/Advertising/Advertising.txt",
+    path: "./ruleset/blackmatrix7/ads.yaml",
+  },
   spotify: {
     url: "https://fastly.jsdelivr.net/gh/blackmatrix7/ios_rule_script@master/rule/Clash/Spotify/Spotify.yaml",
     path: "./ruleset/Spotify.yaml",
@@ -231,6 +237,7 @@ const rules = [
   "RULE-SET,netflix,Netflix",
   "RULE-SET,private,全局直连",
   "RULE-SET,reject,广告过滤",
+  "RULE-SET,ads,广告过滤",
   "RULE-SET,icloud,微软服务",
   "RULE-SET,apple,苹果服务",
   "RULE-SET,google,谷歌服务",
