@@ -35,7 +35,7 @@ const mineRules = [
   "DOMAIN-SUFFIX,tuxingkeji.com,全局直连", // V2rayse节点工具
   "DOMAIN-SUFFIX,15sm.cn,全局直连",
   "DOMAIN-SUFFIX,mf-site2.xyz,全局直连",
-  "DOMAIN-SUFFIX,user.mf-site2.xyz,全局直连",
+  "DOMAIN,user.mf-site2.xyz,全局直连",
   "DOMAIN-SUFFIX,dji.net,全局直连",
   "DOMAIN-SUFFIX,556688.cfd,全局直连",
 ]
