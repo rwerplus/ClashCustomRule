@@ -29,7 +29,6 @@ payload:
   - DOMAIN-KEYWORD,dropbox
   - DOMAIN-KEYWORD,facebook
   - DOMAIN-KEYWORD,fbcdn
-  - DOMAIN-KEYWORD,github
   - DOMAIN-KEYWORD,instagram
   - DOMAIN-KEYWORD,porn
   - DOMAIN-KEYWORD,sci-hub
@@ -45,3 +44,4 @@ payload:
   - DOMAIN-KEYWORD,ttvnw
   - DOMAIN-KEYWORD,omnivore
   - DOMAIN-KEYWORD,nifty
+  - DOMAIN-KEYWORD,openrouter
