@@ -300,7 +300,16 @@ function main(config) {
       type: "select",
       proxies: defaultProxy,
       "include-all": false,
-      icon: "https://fastly.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/adjust.svg",
+      icon: "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Proxy.png",
+    },
+    {
+      ...groupBaseOption,
+      url: "https://chatgpt.com",
+      "expected-status": "200",
+      name: "AIGC",
+      type: "select",
+      "include-all": true,
+      icon: "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/ChatGPT.png",
     },
     {
       ...groupBaseOption,
@@ -308,7 +317,7 @@ function main(config) {
       type: "url-test",
       tolerance: 100,
       "include-all": true,
-      icon: "https://fastly.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/speed.svg",
+      icon: "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Auto.png",
     },
 	
     {
@@ -389,15 +398,6 @@ function main(config) {
     },
     {
       ...groupBaseOption,
-      url: "https://chatgpt.com",
-      "expected-status": "200",
-      name: "AIGC",
-      type: "select",
-      "include-all": true,
-      icon: "https://mirror.ghproxy.com/https://raw.githubusercontent.com/Orz-3/mini/master/Color/OpenAI.png",
-    },
-    {
-      ...groupBaseOption,
       name: "微软服务",
       type: "select",
       proxies: ["全局直连", "节点选择",...defaultProxy],
@@ -423,7 +423,7 @@ function main(config) {
       name: "广告过滤",
       type: "select",
       proxies: ["REJECT", "DIRECT"],
-      icon: "https://fastly.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/bug.svg",
+      icon: "https://fastly.jsdelivr.net/gh/Koolson/Qure/IconSet/Color/Reject.png",
     },
     {
       ...groupBaseOption,
