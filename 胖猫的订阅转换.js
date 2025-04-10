@@ -10,7 +10,7 @@ const mineRules = [
   "DOMAIN,*.cursor.com,AIGC",
   "DOMAIN,*.perplexity.ai,AIGC",
   "PROCESS-NAME,Cursor,AIGC",
-    "DOMAIN,*.chatgpt.com,AIGC",
+  "DOMAIN,*.chatgpt.com,AIGC",
   "DOMAIN-SUFFIX,cursor.sh,AIGC",
   "DOMAIN-SUFFIX,cursor.com,AIGC",
   "DOMAIN-SUFFIX,perplexity.ai,AIGC",
@@ -364,7 +364,7 @@ function main(config) {
         "US AUTO",
         "全局直连",
       ],
-      icon: "https://fastly.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/netflix.svg",
+      icon: "https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Netflix.png",
     },
     {
       ...groupBaseOption,
@@ -379,7 +379,7 @@ function main(config) {
         "US AUTO",
         "全局直连",
       ],
-      icon: "https://fastly.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/youtube.svg",
+      icon: "https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/ForeignMedia.png",
     },
     {
       ...groupBaseOption,
@@ -394,7 +394,7 @@ function main(config) {
         "US AUTO",
         "全局直连",
       ],
-      icon: "https://fastly.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/telegram.svg",
+      icon: "https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Telegram.png",
     },
     {
       ...groupBaseOption,
