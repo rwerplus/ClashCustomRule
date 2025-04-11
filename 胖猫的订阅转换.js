@@ -1,6 +1,7 @@
 const mineRules = [
   "DOMAIN,1024zyz.com,节点选择",
   "DOMAIN-SUFFIX,bigmeok.me,节点选择",
+  "DOMAIN-SUFFIX,mapbox.com,节点选择",
   "DOMAIN-SUFFIX,sorryios.com,节点选择",
   "DOMAIN,freebsd.org,节点选择",
   "RULE-SET,openai,AIGC",
