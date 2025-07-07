@@ -1,4 +1,5 @@
 const mineRules = [
+  "IP-CIDR,203.0.113.45/32,DIRECT",
   "DOMAIN,1024zyz.com,节点选择",
   "DOMAIN-SUFFIX,bigmeok.me,节点选择",
   "DOMAIN-SUFFIX,mapbox.com,节点选择",
