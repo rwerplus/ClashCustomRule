@@ -10,6 +10,7 @@ const commonRules = [
     "DOMAIN,gaccode.com,DIRECT",
     "DOMAIN,openrouter.ai,DIRECT",
     "DOMAIN,moonshot.cn,DIRECT",
+	"DOMAIN-SUFFIX,qcode.cc,PROXY",
 ]
 // 规则集通用配置
 const ruleProviderCommon = {
