@@ -11,6 +11,7 @@ const commonRules = [
     "DOMAIN,openrouter.ai,DIRECT",
     "DOMAIN,moonshot.cn,DIRECT",
 	"DOMAIN-SUFFIX,qcode.cc,Proxy",
+	"DOMAIN-SUFFIX,zed.dev,Proxy",
 ]
 // 规则集通用配置
 const ruleProviderCommon = {
