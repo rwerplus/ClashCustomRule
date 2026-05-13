@@ -1,770 +1,357 @@
-// 参考 Verge Rev 示例 Script 配置
-//
-// Clash Verge Rev (Version ≥ 17.2) & Mihomo-Party (Version ≥ 1.5.10)
-//
-// 最后更新时间: 2025-05-01 22:37
-const commonRules = [
-    "DOMAIN,board.zash.run.place,DIRECT",
-    "DOMAIN,pingcode.tuxingkeji.com,DIRECT",
-    "DOMAIN,dji.com,DIRECT",
-    "DOMAIN,gaccode.com,DIRECT",
-    "DOMAIN,openrouter.ai,DIRECT",
-    "DOMAIN,moonshot.cn,DIRECT",
-	"DOMAIN-SUFFIX,qcode.cc,Proxy",
-	"DOMAIN-SUFFIX,zed.dev,AI",
+// ===========================
+// VPN规则覆写脚本 V3.1
+// ===========================
+
+// ===========================
+// 第一部分：自定义关键词和规则
+// ======= 自定义关键词 =======
+//走自动优选的关键字
+const autoKeywords = [
+  "download"
 ]
+// 代理关键词
+const proxyKeywords = [
+  // "example", 示例，可以添加需要代理的关键词
+  "us.ci",
+  "googleapis",
+  "new-api",
+  "techconsultingco",
+  "new-api.publicvm.com"
+];
+
+// 直连关键词
+const directKeywords = [
+  //"example",  示例，可以添加需要直连的关键词
+  "jetbrains",
+  "codexcn"
+];
+
+// 拦截关键词
+const rejectKeywords = [
+  //"example",  示例，可以添加需要拦截的关键词
+  "adobe.io", //屏蔽Adobe正版检测可能违反软件许可协议
+];
+// ===========================
+// 自动生成规则
+const customRules = [
+  // 代理关键词规则
+  ...proxyKeywords.map((keywords) => `DOMAIN-KEYWORD,${keywords},节点选择`),
+  ...autoKeywords.map((keywords) => `DOMAIN-KEYWORD,${keywords},延迟选优`),
+  // 直连关键词规则
+  ...directKeywords.map((keywords) => `DOMAIN-KEYWORD,${keywords},DIRECT`),
+  // 拦截关键词规则
+  ...rejectKeywords.map((keywords) => `DOMAIN-KEYWORD,${keywords},REJECT`),
+
+  // 其他预设规则
+  "DOMAIN-SUFFIX,googleapis.cn,节点选择", // Google 服务
+  "DOMAIN-SUFFIX,gstatic.com,节点选择", // Google 静态资源
+  "DOMAIN-SUFFIX,xn--ngstr-lra8j.com,节点选择", // Google Play下载服务
+  "DOMAIN-SUFFIX,github.io,节点选择", // GitHub Pages
+  // 自定义规则
+  "DOMAIN-SUFFIX,linux.do,延迟选优", // GitHub Pages
+  "DOMAIN-SUFFIX,vimpl.sbs,延迟选优", // GitHub Pages
+  "DOMAIN-SUFFIX,duckduckgo,延迟选优", // GitHub Pages
+  "DOMAIN-SUFFIX,gihub,延迟选优",
+];
+// ===========================
+// 第二部分：规则集和代理组配置
+// ======= 自定义规则集 =======
+const customRuleSets = [
+  // 局域网与私有地址
+  "GEOIP,LAN,全局直连,no-resolve",
+  "RULE-SET,private,全局直连",
+  "RULE-SET,applications,全局直连",
+  "RULE-SET,lancidr,全局直连,no-resolve",
+
+  // 国内直连
+  "RULE-SET,ChinaMedia,全局直连",
+  "RULE-SET,ChinaDomain,全局直连",
+  "RULE-SET,direct,全局直连",
+  "RULE-SET,cncidr,全局直连,no-resolve",
+  "GEOIP,CN,全局直连,no-resolve",
+
+  // AI服务规则
+  "RULE-SET,ai,AI",
+
+  // 通用服务代理规则
+  "RULE-SET,OneDrive,节点选择",
+  "RULE-SET,icloud,节点选择",
+  "RULE-SET,apple,节点选择",
+  "RULE-SET,google,节点选择",
+  "RULE-SET,GoogleCN,节点选择",
+  "RULE-SET,telegramcidr,节点选择,no-resolve",
+
+  // 国外代理
+  "RULE-SET,proxy,节点选择",
+  "RULE-SET,gfw,节点选择",
+  "RULE-SET,tld-not-cn,节点选择",
+
+  //拦截规则
+  "RULE-SET,reject,全局拦截",
+  "RULE-SET,BanEasyListChina,广告过滤",
+  "RULE-SET,BanEasyList,广告过滤",
+
+  // 兜底规则
+  "MATCH,漏网之鱼",
+];
+// ======== 配置代理组 ========
+// CDN 配置（可切换）
+const CDN_BASE = "https://cdn.jsdmirror.com/gh"; // 推荐：JSDMirror站点
+// const CDN_BASE = "https://cdn.jsdelivr.net/gh"; // jsDelivr官方CDN
+// const CDN_BASE = "https://gcore.jsdelivr.net/gh";      // 备用：GCore CDN
+// const CDN_BASE = "https://testingcf.jsdelivr.net/gh";  // 备用：Cloudflare CDN
+
 // 规则集通用配置
 const ruleProviderCommon = {
+  type: "http",
+  format: "yaml",
+  interval: 86400,
 };
 
-// 策略组通用配置
-const groupBaseOption = {
-  "interval": 300,
-  "url": "http://www.gstatic.com/generate_204",
-  "max-failed-times": 3,
+// 规则集提供者
+const ruleProviders = {
+  // 拦截规则集
+  reject: {
+    ...ruleProviderCommon,
+    behavior: "domain",
+    url: `${CDN_BASE}/Loyalsoldier/clash-rules@release/reject.txt`,
+    path: "./ruleset/loyalsoldier/reject.yaml",
+  },
+  BanEasyListChina: {
+    ...ruleProviderCommon,
+    behavior: "classical",
+    format: "text",
+    url: `${CDN_BASE}/ACL4SSR/ACL4SSR/Clash/BanEasyListChina.list`,
+    path: "./ruleset/acl4ssr/BanEasyListChina.yaml",
+  },
+  BanEasyList: {
+    ...ruleProviderCommon,
+    behavior: "classical",
+    format: "text",
+    url: `${CDN_BASE}/ACL4SSR/ACL4SSR/Clash/BanEasyList.list`,
+    path: "./ruleset/acl4ssr/BanEasyList.yaml",
+  },
+  // 局域网与私有地址
+  private: {
+    ...ruleProviderCommon,
+    behavior: "domain",
+    url: `${CDN_BASE}/Loyalsoldier/clash-rules@release/private.txt`,
+    path: "./ruleset/loyalsoldier/private.yaml",
+  },
+  applications: {
+    ...ruleProviderCommon,
+    behavior: "classical",
+    url: `${CDN_BASE}/Loyalsoldier/clash-rules@release/applications.txt`,
+    path: "./ruleset/loyalsoldier/applications.yaml",
+  },
+  lancidr: {
+    ...ruleProviderCommon,
+    behavior: "ipcidr",
+    url: `${CDN_BASE}/Loyalsoldier/clash-rules@release/lancidr.txt`,
+    path: "./ruleset/loyalsoldier/lancidr.yaml",
+  },
+
+  // AI服务规则集
+  ai: {
+    ...ruleProviderCommon,
+    behavior: "classical",
+    format: "text",
+    url: `${CDN_BASE}/Passerby1011/Garbage-dump/AI.list`,
+    path: "./ruleset/passerby1011/ai.yaml",
+  },
+
+  // 通用服务代理规则集
+  OneDrive: {
+    ...ruleProviderCommon,
+    behavior: "classical",
+    format: "text",
+    url: `${CDN_BASE}/ACL4SSR/ACL4SSR/Clash/OneDrive.list`,
+    path: "./ruleset/acl4ssr/OneDrive.yaml",
+  },
+  icloud: {
+    ...ruleProviderCommon,
+    behavior: "domain",
+    url: `${CDN_BASE}/Loyalsoldier/clash-rules@release/icloud.txt`,
+    path: "./ruleset/loyalsoldier/icloud.yaml",
+  },
+  apple: {
+    ...ruleProviderCommon,
+    behavior: "domain",
+    url: `${CDN_BASE}/Loyalsoldier/clash-rules@release/apple.txt`,
+    path: "./ruleset/loyalsoldier/apple.yaml",
+  },
+  google: {
+    ...ruleProviderCommon,
+    behavior: "domain",
+    url: `${CDN_BASE}/Loyalsoldier/clash-rules@release/google.txt`,
+    path: "./ruleset/loyalsoldier/google.yaml",
+  },
+  GoogleCN: {
+    ...ruleProviderCommon,
+    behavior: "classical",
+    format: "text",
+    url: `${CDN_BASE}/ACL4SSR/ACL4SSR/Clash/GoogleCN.list`,
+    path: "./ruleset/acl4ssr/GoogleCN.yaml",
+  },
+  telegramcidr: {
+    ...ruleProviderCommon,
+    behavior: "ipcidr",
+    url: `${CDN_BASE}/Loyalsoldier/clash-rules@release/telegramcidr.txt`,
+    path: "./ruleset/loyalsoldier/telegramcidr.yaml",
+  },
+  // 国内直连
+  ChinaMedia: {
+    ...ruleProviderCommon,
+    behavior: "classical",
+    format: "text",
+    url: `${CDN_BASE}/ACL4SSR/ACL4SSR/Clash/ChinaMedia.list`,
+    path: "./ruleset/acl4ssr/ChinaMedia.yaml",
+  },
+  ChinaDomain: {
+    ...ruleProviderCommon,
+    behavior: "classical",
+    format: "text",
+    url: `${CDN_BASE}/ACL4SSR/ACL4SSR/Clash/ChinaDomain.list`,
+    path: "./ruleset/acl4ssr/ChinaDomain.yaml",
+  },
+  direct: {
+    ...ruleProviderCommon,
+    behavior: "domain",
+    url: `${CDN_BASE}/Loyalsoldier/clash-rules@release/direct.txt`,
+    path: "./ruleset/loyalsoldier/direct.yaml",
+  },
+
+  cncidr: {
+    ...ruleProviderCommon,
+    behavior: "ipcidr",
+    url: `${CDN_BASE}/Loyalsoldier/clash-rules@release/cncidr.txt`,
+    path: "./ruleset/loyalsoldier/cncidr.yaml",
+  },
+  // 国外代理
+  proxy: {
+    ...ruleProviderCommon,
+    behavior: "domain",
+    url: `${CDN_BASE}/Loyalsoldier/clash-rules@release/proxy.txt`,
+    path: "./ruleset/loyalsoldier/proxy.yaml",
+  },
+  gfw: {
+    ...ruleProviderCommon,
+    behavior: "domain",
+    url: `${CDN_BASE}/Loyalsoldier/clash-rules@release/gfw.txt`,
+    path: "./ruleset/loyalsoldier/gfw.yaml",
+  },
+  "tld-not-cn": {
+    ...ruleProviderCommon,
+    behavior: "domain",
+    url: `${CDN_BASE}/Loyalsoldier/clash-rules@release/tld-not-cn.txt`,
+    path: "./ruleset/loyalsoldier/tld-not-cn.yaml",
+  },
 };
 
+// 最终规则列表
+const rules = [...customRules, ...customRuleSets];
+
+// ===========================
 // 程序入口
 function main(config) {
-  const proxyCount = config?.proxies?.length ?? 0;
-  const proxyProviderCount =
-    typeof config?.["proxy-providers"] === "object" ? Object.keys(config["proxy-providers"]).length : 0;
-  if (proxyCount === 0 && proxyProviderCount === 0) {
-    throw new Error("配置文件中未找到任何代理");
+  // 验证配置
+  if (!config) {
+    throw new Error("配置对象为空");
   }
 
-  // 覆盖通用配置
-  config["mixed-port"] = "7890";
-  config["tcp-concurrent"] = true;
-  config["allow-lan"] = true;
-  config["ipv6"] = true;
-  config["log-level"] = "info";
-  config["unified-delay"] = "true";
-  config["find-process-mode"] = "strict";
-  config["global-client-fingerprint"] = "chrome";
+  const proxyCount = config?.proxies?.length ?? 0;
+  const proxyProviderCount = config?.["proxy-providers"]
+    ? Object.keys(config["proxy-providers"]).length
+    : 0;
 
-  // 覆盖 dns 配置
-  config["dns"] = {
-    "enable": true,
-    "listen": "0.0.0.0:1053",
-    "ipv6": true,
-    "enhanced-mode": "fake-ip",
-    "fake-ip-range": "198.18.0.1/16",
-    "fake-ip-filter": ["*", "+.lan", "+.local", "+.direct", "+.msftconnecttest.com", "+.msftncsi.com"],
-    "default-nameserver": ["223.5.5.5", "119.29.29.29"],
-    "nameserver": ["https://dns.alidns.com/dns-query", "https://doh.pub/dns-query"],
-    "proxy-server-nameserver": ["https://dns.alidns.com/dns-query", "https://doh.pub/dns-query"]
+  if (proxyCount === 0 && proxyProviderCount === 0) {
+    throw new Error("配置文件中未找到任何代理节点");
+  }
+
+  // 代理组通用配置
+  const groupBaseOption = {
+    interval: 300,
+    timeout: 3000,
+    //url: "https://www.gstatic.com/generate_204",
+    url: "http://www.apple.com/library/test/success.html",
+    lazy: true,
+    "max-failed-times": 3,
+    hidden: false,
   };
 
-  // 覆盖 geodata 配置
-  config["geodata-mode"] = true;
-  config["geox-url"] = {
-    "geoip": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geoip.dat",
-    "geosite": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geosite.dat",
-    "mmdb": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/country.mmdb",
-    "asn": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/GeoLite2-ASN.mmdb"
-  };
-
-  // 覆盖 sniffer 配置
-  config["sniffer"] = {
-    "enable": true,
-    "parse-pure-ip": true,
-    "sniff": {
-      "TLS": {
-        "ports": ["443", "8443"]
-      },
-      "HTTP": {
-        "ports": ["80", "8080-8880"],
-        "override-destination": true
-      },
-      "QUIC": {
-        "ports": ["443", "8443"]
-      }
-    }
-  };
-
-  // 覆盖 tun 配置
-  config["tun"] = {
-    "enable": true,
-    "stack": "mixed",
-    "dns-hijack": ["any:53"],
-    "auto-route": true,
-    "auto-detect-interface": true
-  };
-
-  // 覆盖策略组
+  // 覆盖代理组配置
   config["proxy-groups"] = [
     {
       ...groupBaseOption,
-      "name": "Final",
-      "type": "select",
-      "proxies": ["Proxy", "DIRECT"],
-      "icon": "https://gh-proxy.com/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Final.png"
-    },
-    {
-      ...groupBaseOption,
-      "name": "Proxy",
-      "type": "select",
-      "proxies": ["HongKong", "TaiWan", "Japan", "Singapore", "America", "AllServer", "DIRECT"],
-      "icon": "https://gh-proxy.com/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Rocket.png"
-    },
-    {
-      ...groupBaseOption,
-      "name": "AI",
-      "type": "select",
+      name: "节点选择",
+      type: "select",
+      proxies: ["美国节点", "延迟选优", "DIRECT"],
       "include-all": true,
-      "proxies": ["Proxy", "HongKong", "TaiWan", "Japan", "Singapore", "America", "AllServer"],
-      "icon": "https://gh-proxy.com/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/ChatGPT.png"
+      icon: "https://gh-proxy.com/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Auto.png",
     },
     {
       ...groupBaseOption,
-      "name": "YouTube",
-      "type": "select",
-      "proxies": ["Proxy", "HongKong", "TaiWan", "Japan", "Singapore", "America", "AllServer"],
-      "icon": "https://gh-proxy.com/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/YouTube.png"
-    },
-    {
-      ...groupBaseOption,
-      "name": "NETFLIX",
-      "type": "select",
-      "proxies": ["Singapore", "Proxy", "HongKong", "TaiWan", "Japan", "America", "AllServer"],
-      "icon": "https://gh-proxy.com/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Netflix.png"
-    },
-    {
-      ...groupBaseOption,
-      "name": "Disney+",
-      "type": "select",
-      "proxies": ["Proxy", "HongKong", "TaiWan", "Japan", "Singapore", "America", "AllServer"],
-      "icon": "https://gh-proxy.com/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Disney.png"
-    },
-    {
-      ...groupBaseOption,
-      "name": "Emby",
-      "type": "select",
-      "proxies": ["Proxy", "HongKong", "TaiWan", "Japan", "Singapore", "America", "AllServer", "DIRECT"],
-      "icon": "https://gh-proxy.com/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Emby.png"
-    },
-    {
-      ...groupBaseOption,
-      "name": "TikTok",
-      "type": "select",
-      "proxies": ["Proxy", "HongKong", "TaiWan", "Japan", "Singapore", "America", "AllServer"],
-      "icon": "https://gh-proxy.com/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/TikTok.png"
-    },
-    {
-      ...groupBaseOption,
-      "name": "bilibili",
-      "type": "select",
-      "proxies": ["DIRECT", "HongKong", "TaiWan"],
-      "icon": "https://gh-proxy.com/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/bilibili_3.png"
-    },
-    {
-      ...groupBaseOption,
-      "name": "Spotify",
-      "type": "select",
-      "proxies": ["Proxy", "HongKong", "TaiWan", "Japan", "Singapore", "America", "AllServer", "DIRECT"],
-      "icon": "https://gh-proxy.com/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Spotify.png"
-    },
-    {
-      ...groupBaseOption,
-      "name": "Streaming",
-      "type": "select",
-      "proxies": ["Proxy", "HongKong", "TaiWan", "Japan", "Singapore", "America", "AllServer"],
-      "icon": "https://gh-proxy.com/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Streaming.png"
-    },
-    {
-      ...groupBaseOption,
-      "name": "Telegram",
-      "type": "select",
+      name: "美国节点",
+      type: "select",
       "include-all": true,
-      "proxies": ["Proxy", "HongKong", "TaiWan", "Japan", "Singapore", "America", "AllServer"],
-      "icon": "https://gh-proxy.com/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Telegram_X.png"
+      filter: "(?i)US|美国|🇺🇸|States|American|台|日|Tai",
+      icon: "https://cdn.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/flags/us.svg",
     },
     {
       ...groupBaseOption,
-      "name": "X",
-      "type": "select",
+      name: "延迟选优",
+      type: "url-test",
+      tolerance: 50,
       "include-all": true,
-      "proxies": ["Proxy", "HongKong", "TaiWan", "Japan", "Singapore", "America", "AllServer"],
-      "icon": "https://gh-proxy.com/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/X.png"
+      filter: "^(?!.*(套餐|剩余|到期|流量|官网)).*$",
+      icon: "https://cdn.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/speed.svg",
     },
     {
       ...groupBaseOption,
-      "name": "Apple",
-      "type": "select",
-      "proxies": ["Proxy", "HongKong", "TaiWan", "Japan", "Singapore", "America", "AllServer", "DIRECT"],
-      "icon": "https://gh-proxy.com/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Apple_1.png"
+      name: "AI",
+      type: "select",
+      proxies: ["美国节点", "延迟选优", "DIRECT"],
+      icon: "https://github.com/DustinWin/ruleset_geodata/releases/download/icons/ai.png",
     },
     {
       ...groupBaseOption,
-      "name": "Google",
-      "type": "select",
-      "proxies": ["Japan", "Proxy", "HongKong", "TaiWan", "Singapore", "America", "AllServer", "DIRECT"],
-      "icon": "https://gh-proxy.com/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Google_Search.png"
+      name: "全局直连",
+      type: "select",
+      proxies: ["DIRECT", "节点选择", "延迟选优"],
+      icon: "https://cdn.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/link.svg",
     },
     {
       ...groupBaseOption,
-      "name": "Microsoft",
-      "type": "select",
-      "proxies": ["Proxy", "HongKong", "TaiWan", "Japan", "Singapore", "America", "AllServer", "DIRECT"],
-      "icon": "https://gh-proxy.com/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Windows_11.png"
+      name: "全局拦截",
+      type: "select",
+      proxies: ["REJECT", "DIRECT", "节点选择", "延迟选优"],
+      icon: "https://cdn.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/block.svg",
     },
     {
       ...groupBaseOption,
-      "name": "Games",
-      "type": "select",
-      "proxies": ["DIRECT", "Proxy", "HongKong", "TaiWan", "Japan", "Singapore", "America", "AllServer", ],
-      "icon": "https://gh-proxy.com/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Game.png"
-    },
-    // 地区分组
-    {
-      ...groupBaseOption,
-      "name": "HongKong",
-      "type": "select",
-      "proxies": ["HK-Auto", "HK-FallBack", "HK-LoadBalance"],
-      "include-all": true,
-      "filter": "(?i)🇭🇰|香港|(\b(HK|Hong)\b)",
-      "icon": "https://gh-proxy.com/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Hong_Kong.png"
+      name: "广告过滤",
+      type: "select",
+      proxies: ["REJECT", "DIRECT", "节点选择", "延迟选优"],
+      icon: "https://cdn.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/bug.svg",
     },
     {
       ...groupBaseOption,
-      "name": "HK-Auto",
-      "type": "url-test",
-      "tolerance": 50,
-      "lazy": true,
-      "include-all": true,
-      "hidden": true,
-      "filter": "(?i)🇭🇰|香港|(\b(HK|Hong)\b)",
-      "icon": "https://gh-proxy.com/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Hong_Kong.png"
+      name: "漏网之鱼",
+      type: "select",
+      proxies: ["节点选择", "DIRECT", "延迟选优"],
+      icon: "https://cdn.jsdelivr.net/gh/clash-verge-rev/clash-verge-rev.github.io@main/docs/assets/icons/fish.svg",
     },
-    {
-      ...groupBaseOption,
-      "name": "HK-FallBack",
-      "type": "fallback",
-      "lazy": true,
-      "include-all": true,
-      "hidden": true,
-      "filter": "(?i)🇭🇰|香港|(\b(HK|Hong)\b)",
-      "icon": "https://gh-proxy.com/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Hong_Kong.png"
-    },
-    {
-      ...groupBaseOption,
-      "name": "HK-LoadBalance",
-      "type": "load-balance",
-      "lazy": true,
-      "include-all": true,
-      "hidden": true,
-      "filter": "(?i)🇭🇰|香港|(\b(HK|Hong)\b)",
-      "icon": "https://gh-proxy.com/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Hong_Kong.png"
-    },
-    {
-      ...groupBaseOption,
-      "name": "TaiWan",
-      "type": "select",
-      "proxies": ["TW-Auto", "TW-FallBack", "TW-LoadBalance"],
-      "include-all": true,
-      "filter": "(?i)🇨🇳|🇹🇼|台湾|(\b(TW|Tai|Taiwan)\b)",
-      "icon": "https://gh-proxy.com/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/China.png"
-    },
-    {
-      ...groupBaseOption,
-      "name": "TW-Auto",
-      "type": "url-test",
-      "tolerance": 50,
-      "lazy": true,
-      "include-all": true,
-      "hidden": true,
-      "filter": "(?i)🇨🇳|🇹🇼|台湾|(\b(TW|Tai|Taiwan)\b)",
-      "icon": "https://gh-proxy.com/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/China.png"
-    },
-    {
-      ...groupBaseOption,
-      "name": "TW-FallBack",
-      "type": "fallback",
-      "lazy": true,
-      "include-all": true,
-      "hidden": true,
-      "filter": "(?i)🇨🇳|🇹🇼|台湾|(\b(TW|Tai|Taiwan)\b)",
-      "icon": "https://gh-proxy.com/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/China.png"
-    },
-    {
-      ...groupBaseOption,
-      "name": "TW-LoadBalance",
-      "type": "load-balance",
-      "lazy": true,
-      "include-all": true,
-      "hidden": true,
-      "filter": "(?i)🇨🇳|🇹🇼|台湾|(\b(TW|Tai|Taiwan)\b)",
-      "icon": "https://gh-proxy.com/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/China.png"
-    },
-    {
-      ...groupBaseOption,
-      "name": "Japan",
-      "type": "select",
-      "proxies": ["JP-Auto", "JP-FallBack", "JP-LoadBalance"],
-      "include-all": true,
-      "filter": "(?i)🇯🇵|日本|东京|(\b(JP|Japan)\b)",
-      "icon": "https://gh-proxy.com/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Japan.png"
-    },
-    {
-      ...groupBaseOption,
-      "name": "JP-Auto",
-      "type": "url-test",
-      "tolerance": 50,
-      "lazy": true,
-      "include-all": true,
-      "hidden": true,
-      "filter": "(?i)🇯🇵|日本|东京|(\b(JP|Japan)\b)",
-      "icon": "https://gh-proxy.com/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Japan.png"
-    },
-    {
-      ...groupBaseOption,
-      "name": "JP-FallBack",
-      "type": "fallback",
-      "lazy": true,
-      "include-all": true,
-      "hidden": true,
-      "filter": "(?i)🇯🇵|日本|东京|(\b(JP|Japan)\b)",
-      "icon": "https://gh-proxy.com/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Japan.png"
-    },
-    {
-      ...groupBaseOption,
-      "name": "JP-LoadBalance",
-      "type": "load-balance",
-      "lazy": true,
-      "include-all": true,
-      "hidden": true,
-      "filter": "(?i)🇯🇵|日本|东京|(\b(JP|Japan)\b)",
-      "icon": "https://gh-proxy.com/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Japan.png"
-    },
-    {
-      ...groupBaseOption,
-      "name": "Singapore",
-      "type": "select",
-      "proxies": ["SG-Auto", "SG-FallBack", "SG-LoadBalance"],
-      "include-all": true,
-      "filter": "(?i)🇸🇬|新加坡|狮|(\b(SG|Singapore)\b)",
-      "icon": "https://gh-proxy.com/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Singapore.png"
-    },
-    {
-      ...groupBaseOption,
-      "name": "SG-Auto",
-      "type": "url-test",
-      "tolerance": 50,
-      "lazy": true,
-      "include-all": true,
-      "hidden": true,
-      "filter": "(?i)🇸🇬|新加坡|狮|(\b(SG|Singapore)\b)",
-      "icon": "https://gh-proxy.com/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Singapore.png"
-    },
-    {
-      ...groupBaseOption,
-      "name": "SG-FallBack",
-      "type": "fallback",
-      "lazy": true,
-      "include-all": true,
-      "hidden": true,
-      "filter": "(?i)🇸🇬|新加坡|狮|(\b(SG|Singapore)\b)",
-      "icon": "https://gh-proxy.com/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Singapore.png"
-    },
-    {
-      ...groupBaseOption,
-      "name": "SG-LoadBalance",
-      "type": "load-balance",
-      "lazy": true,
-      "include-all": true,
-      "hidden": true,
-      "filter": "(?i)🇸🇬|新加坡|狮|(\b(SG|Singapore)\b)",
-      "icon": "https://gh-proxy.com/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Singapore.png"
-    },
-    {
-      ...groupBaseOption,
-      "name": "America",
-      "type": "select",
-      "proxies": ["US-Auto", "US-FallBack", "US-LoadBalance"],
-      "include-all": true,
-      "filter": "(?i)🇺🇸|美国|洛杉矶|圣何塞|(\b(US|United States)\b)",
-      "icon": "https://gh-proxy.com/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/United_States.png"
-    },
-    {
-      ...groupBaseOption,
-      "name": "US-Auto",
-      "type": "url-test",
-      "tolerance": 50,
-      "lazy": true,
-      "include-all": true,
-      "hidden": true,
-      "filter": "(?i)🇺🇸|美国|洛杉矶|圣何塞|(\b(US|United States)\b)",
-      "icon": "https://gh-proxy.com/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/United_States.png"
-    },
-    {
-      ...groupBaseOption,
-      "name": "US-FallBack",
-      "type": "fallback",
-      "lazy": true,
-      "include-all": true,
-      "hidden": true,
-      "filter": "(?i)🇺🇸|美国|洛杉矶|圣何塞|(\b(US|United States)\b)",
-      "icon": "https://gh-proxy.com/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/United_States.png"
-    },
-    {
-      ...groupBaseOption,
-      "name": "US-LoadBalance",
-      "type": "load-balance",
-      "lazy": true,
-      "include-all": true,
-      "hidden": true,
-      "filter": "(?i)🇺🇸|美国|洛杉矶|圣何塞|(\b(US|United States)\b)",
-      "icon": "https://gh-proxy.com/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/United_States.png"
-    },
-    {
-      ...groupBaseOption,
-      "name": "AllServer",
-      "type": "select",
-      "proxies": ["All-Auto"],
-      "include-all": true,
-      "filter": "(?=.*(.))(?!.*((?i)群|邀请|返利|循环|官网|客服|网站|网址|获取|订阅|流量|到期|机场|下次|版本|官址|备用|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|(\b(USE|USED|TOTAL|Traffic|Expire|EMAIL|Panel|Channel|Author)\b|(\d{4}-\d{2}-\d{2}|\d+G)))).*$",
-      "icon": "https://gh-proxy.com/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Airport.png"
-    },
-    {
-      ...groupBaseOption,
-      "name": "All-Auto",
-      "type": "url-test",
-      "tolerance": 50,
-      "lazy": true,
-      "include-all": true,
-      "hidden": true,
-      "filter": "(?=.*(.))(?!.*((?i)群|邀请|返利|循环|官网|客服|网站|网址|获取|订阅|流量|到期|机场|下次|版本|官址|备用|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|使用|提示|特别|访问|支持|教程|关注|更新|作者|加入|(\b(USE|USED|TOTAL|Traffic|Expire|EMAIL|Panel|Channel|Author)\b|(\d{4}-\d{2}-\d{2}|\d+G)))).*$",
-      "icon": "https://gh-proxy.com/https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Airport.png"
-    }
   ];
 
-  // 覆盖规则集
-  config["rule-providers"] = {
-    "mine-proxy": {
-      ...ruleProviderCommon,
-      "behavior": "domain",
-      "url": "https://raw.githubusercontent.com/rwerplus/ClashCustomRule/refs/heads/master/mine-proxy.yaml",
-      "path": "./rules/mine-proxy.yaml",
-      "type": "http",
-      "format": "yaml",
-      "interval": 86400
-    },
-    "private-domain": {
-      ...ruleProviderCommon,
-      "behavior": "domain",
-      "url": "https://gh-proxy.com/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/private.mrs",
-      "path": "./rules/private-domain.mrs",
-      "type": "http",
-      "format": "mrs",
-      "interval": 86400
-    },
-    "private-ip": {
-      ...ruleProviderCommon,
-      "behavior": "ipcidr",
-      "url": "https://gh-proxy.com/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/private.mrs",
-      "path": "./rules/private-ip.mrs",
-      "type": "http",
-      "format": "mrs",
-      "interval": 86400
-    },
-    "ai-domain": {
-      ...ruleProviderCommon,
-      "behavior": "domain",
-      "url": "https://gh-proxy.com/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-ai-!cn.mrs",
-      "path": "./rules/ai-domain.mrs",
-      "type": "http",
-      "format": "mrs",
-      "interval": 86400
-    },
-    "youtube-domain": {
-      ...ruleProviderCommon,
-      "behavior": "domain",
-      "url": "https://gh-proxy.com/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/youtube.mrs",
-      "path": "./rules/youtube-domain.mrs",
-      "type": "http",
-      "format": "mrs",
-      "interval": 86400
-    },
-    "netflix-domain": {
-      ...ruleProviderCommon,
-      "behavior": "domain",
-      "url": "https://gh-proxy.com/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/netflix.mrs",
-      "path": "./rules/netflix-domain.mrs",
-      "type": "http",
-      "format": "mrs",
-      "interval": 86400
-    },
-    "netflix-ip": {
-      ...ruleProviderCommon,
-      "behavior": "ipcidr",
-      "url": "https://gh-proxy.com/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/netflix.mrs",
-      "path": "./rules/netflix-ip.mrs",
-      "type": "http",
-      "format": "mrs",
-      "interval": 86400
-    },
-    "disney-domain": {
-      ...ruleProviderCommon,
-      "behavior": "domain",
-      "url": "https://gh-proxy.com/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/disney.mrs",
-      "path": "./rules/disney-domain.mrs",
-      "type": "http",
-      "format": "mrs",
-      "interval": 86400
-    },
-    "emby-classical": {
-      ...ruleProviderCommon,
-      "behavior": "classical",
-      "url": "https://gh-proxy.com/https://raw.githubusercontent.com/Coldvvater/Mononoke/master/Clash/Rules/Emby.list",
-      "path": "./rules/emby-classical.list",
-      "type": "http",
-      "format": "text",
-      "interval": 86400
-    },
-    "tiktok-domain": {
-      ...ruleProviderCommon,
-      "behavior": "domain",
-      "url": "https://gh-proxy.com/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/tiktok.mrs",
-      "path": "./rules/tiktok-domain.mrs",
-      "type": "http",
-      "format": "mrs",
-      "interval": 86400
-    },
-    "bahamut-domain": {
-      ...ruleProviderCommon,
-      "behavior": "domain",
-      "url": "https://gh-proxy.com/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/bahamut.mrs",
-      "path": "./rules/bahamut-domain.mrs",
-      "type": "http",
-      "format": "mrs",
-      "interval": 86400
-    },
-    "biliintl-domain": {
-      ...ruleProviderCommon,
-      "behavior": "domain",
-      "url": "https://gh-proxy.com/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/biliintl.mrs",
-      "path": "./rules/biliintl-domain.mrs",
-      "type": "http",
-      "format": "mrs",
-      "interval": 86400
-    },
-    "bilibili-domain": {
-      ...ruleProviderCommon,
-      "behavior": "domain",
-      "url": "https://gh-proxy.com/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/bilibili.mrs",
-      "path": "./bilibili-domain.mrs",
-      "type": "http",
-      "format": "mrs",
-      "interval": 86400
-    },
-    "bilibili-ip": {
-      ...ruleProviderCommon,
-      "behavior": "ipcidr",
-      "url": "https://gh-proxy.com/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo-lite/geoip/bilibili.mrs",
-      "path": "./bilibili-ip.mrs",
-      "type": "http",
-      "format": "mrs",
-      "interval": 86400
-    },
-    "spotify-domain": {
-      ...ruleProviderCommon,
-      "behavior": "domain",
-      "url": "https://gh-proxy.com/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/spotify.mrs",
-      "path": "./rules/spotify-domain.mrs",
-      "type": "http",
-      "format": "mrs",
-      "interval": 86400
-    },
-    "proxymedia-classical": {
-      ...ruleProviderCommon,
-      "behavior": "classical",
-      "url": "https://gh-proxy.com/https://raw.githubusercontent.com/Coldvvater/Mononoke/master/Clash/Rules/ProxyMedia.list",
-      "path": "./rules/proxymedia-classical.list",
-      "type": "http",
-      "format": "text",
-      "interval": 86400
-    },
-    "wechat-classical": {
-      ...ruleProviderCommon,
-      "behavior": "classical",
-      "url": "https://gh-proxy.com/https://raw.githubusercontent.com/Coldvvater/Mononoke/master/Clash/Rules/WeChat.list",
-      "path": "./rules/wechat-classical.list",
-      "type": "http",
-      "format": "text",
-      "interval": 86400
-    },
-    "telegram-domain": {
-      ...ruleProviderCommon,
-      "behavior": "domain",
-      "url": "https://gh-proxy.com/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/telegram.mrs",
-      "path": "./rules/telegram-domain.mrs",
-      "type": "http",
-      "format": "mrs",
-      "interval": 86400
-    },
-    "telegram-ip": {
-      ...ruleProviderCommon,
-      "behavior": "ipcidr",
-      "url": "https://gh-proxy.com/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/telegram.mrs",
-      "path": "./rules/telegram-ip.mrs",
-      "type": "http",
-      "format": "mrs",
-      "interval": 86400
-    },
-    "github-domain": {
-      ...ruleProviderCommon,
-      "behavior": "domain",
-      "url": "https://gh-proxy.com/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/github.mrs",
-      "path": "./rules/github-domain.mrs",
-      "type": "http",
-      "format": "mrs",
-      "interval": 86400
-    },
-    "twitter-domain": {
-      ...ruleProviderCommon,
-      "behavior": "domain",
-      "url": "https://gh-proxy.com/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/twitter.mrs",
-      "path": "./rules/twitter-domain.mrs",
-      "type": "http",
-      "format": "mrs",
-      "interval": 86400
-    },
-    "twitter-ip": {
-      ...ruleProviderCommon,
-      "behavior": "ipcidr",
-      "url": "https://gh-proxy.com/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/twitter.mrs",
-      "path": "./rules/twitter-ip.mrs",
-      "type": "http",
-      "format": "mrs",
-      "interval": 86400
-    },
-    "apple-classical": {
-      ...ruleProviderCommon,
-      "behavior": "classical",
-      "url": "https://gh-proxy.com/https://raw.githubusercontent.com/Coldvvater/Mononoke/master/Clash/Rules/AppleProxyService.list",
-      "path": "./rules/apple-classical.list",
-      "type": "http",
-      "format": "text",
-      "interval": 86400
-    },
-    "apple-domain": {
-      ...ruleProviderCommon,
-      "behavior": "domain",
-      "url": "https://gh-proxy.com/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/apple.mrs",
-      "path": "./rules/apple-domain.mrs",
-      "type": "http",
-      "format": "mrs",
-      "interval": 86400
-    },
-    "apple-ip": {
-      ...ruleProviderCommon,
-      "behavior": "ipcidr",
-      "url": "https://gh-proxy.com/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo-lite/geoip/apple.mrs",
-      "path": "./rules/apple-ip.mrs",
-      "type": "http",
-      "format": "mrs",
-      "interval": 86400
-    },
-    "google-domain": {
-      ...ruleProviderCommon,
-      "behavior": "domain",
-      "url": "https://gh-proxy.com/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/google.mrs",
-      "path": "./rules/google-domain.mrs",
-      "type": "http",
-      "format": "mrs",
-      "interval": 86400
-    },
-    "google-ip": {
-      ...ruleProviderCommon,
-      "behavior": "ipcidr",
-      "url": "https://gh-proxy.com/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/google.mrs",
-      "path": "./rules/google-ip.mrs",
-      "type": "http",
-      "format": "mrs",
-      "interval": 86400
-    },
-    "microsoft-domain": {
-      ...ruleProviderCommon,
-      "behavior": "domain",
-      "url": "https://gh-proxy.com/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/microsoft.mrs",
-      "path": "./rules/microsoft-domain.mrs",
-      "type": "http",
-      "format": "mrs",
-      "interval": 86400
-    },
-    "games-domain": {
-      ...ruleProviderCommon,
-      "behavior": "domain",
-      "url": "https://gh-proxy.com/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-games.mrs",
-      "path": "./rules/games-domain.mrs",
-      "type": "http",
-      "format": "mrs",
-      "interval": 86400
-    },
-    "cn-domain": {
-      ...ruleProviderCommon,
-      "behavior": "domain",
-      "url": "https://gh-proxy.com/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/cn.mrs",
-      "path": "./rules/cn-domain.mrs",
-      "type": "http",
-      "format": "mrs",
-      "interval": 86400
-    },
-    "proxy-domain": {
-      ...ruleProviderCommon,
-      "behavior": "domain",
-      "url": "https://gh-proxy.com/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/geolocation-!cn.mrs",
-      "path": "./rules/proxy-domain.mrs",
-      "type": "http",
-      "format": "mrs",
-      "interval": 86400
-    }
-  };
-
-  // 覆盖规则
-  config["rules"] = [
-	...commonRules,
-    "DOMAIN,clash.razord.top,DIRECT",
-    "DOMAIN,yacd.metacubex.one,DIRECT",
-    "DOMAIN,yacd.haishan.me,DIRECT",
-    "DOMAIN,d.metacubex.one,DIRECT",
-    "DOMAIN,board.zash.run.place,DIRECT",
-    "RULE-SET,mine-proxy,Proxy",
-    "RULE-SET,private-domain,DIRECT",
-    "RULE-SET,ai-domain,AI",
-    "RULE-SET,youtube-domain,YouTube",
-    "RULE-SET,netflix-domain,NETFLIX",
-    "RULE-SET,disney-domain,Disney+",
-    "RULE-SET,emby-classical,Emby",
-    "RULE-SET,tiktok-domain,TikTok",
-    "RULE-SET,bahamut-domain,TaiWan",
-    "RULE-SET,biliintl-domain,Streaming",
-    "RULE-SET,bilibili-domain,bilibili",
-    "RULE-SET,spotify-domain,Spotify",
-    "RULE-SET,proxymedia-classical,Streaming",
-    "RULE-SET,wechat-classical,DIRECT",
-    "RULE-SET,telegram-domain,Telegram",
-    "RULE-SET,github-domain,Proxy",
-    "RULE-SET,twitter-domain,X",
-    "RULE-SET,apple-classical,America",
-    "RULE-SET,apple-domain,Apple",
-    "RULE-SET,google-domain,Google",
-    "RULE-SET,microsoft-domain,Microsoft",
-    "RULE-SET,games-domain,Games",
-    "RULE-SET,proxy-domain,Proxy",
-    "RULE-SET,google-ip,Google",
-    "RULE-SET,netflix-ip,NETFLIX",
-    "RULE-SET,telegram-ip,Telegram",
-    "RULE-SET,twitter-ip,X",
-    "RULE-SET,cn-domain,DIRECT",
-    "RULE-SET,bilibili-ip,bilibili",
-    "RULE-SET,apple-ip,Apple",
-    "RULE-SET,private-ip,DIRECT",
-    "GEOIP,cn,DIRECT",
-    "MATCH,Final"
-  ];
+  // 覆盖规则配置
+  config["rule-providers"] = ruleProviders;
+  config.rules = rules;
 
   // 返回修改后的配置
   return config;
+}
+
+// Node.js 环境支持
+if (typeof module !== "undefined" && module.exports) {
+  module.exports = main;
 }
